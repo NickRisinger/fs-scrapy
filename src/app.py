@@ -1,6 +1,11 @@
+import signal
 import sys
-import re
 
+from utils import validate_link, graceful_shutdown
+
+
+signal.signal(signal.SIGINT, graceful_shutdown)
+signal.signal(signal.SIGTERM, graceful_shutdown)
 '''
 https://www.flashscorekz.com/match/8IDNpdqo/#/match-summary
 https://www.flashscorekz.com/match/lYWjjILN/#/match-summary
@@ -8,15 +13,6 @@ https://www.flashscorekz.com/match/2HYrhviB/#/match-summary
 https://www.flashscorekz.com/match/rZxSmhvo/#/match-summary
 https://www.flashscorekz.com/match/j1TMbSQH/#/match-summary
 '''
-
-def validate_link(link):
-    regexp = re.compile(r"^https://www\.flashscorekz\.com/match/[A-Za-z0-9]+/#/match-summary$")
-
-    if regexp.match(link):
-        return True
-    else:
-        return False
-
 
 def get_links():
     print("Введите ссылки, после каждой ссылки нужно нажать 'Enter'.\nДля того чтобы закончить ввод 'break'\n")
@@ -39,12 +35,15 @@ def get_links():
 
     return links
 
-
 if __name__ == '__main__':
-    links = get_links()
+    try:
+        links = get_links()
 
-    if not links:
-        print("Вы не ввели не одной ссылки. Программа остановлена.")
-        sys.exit()
+        if not links:
+            print("Вы не ввели не одной ссылки. Программа остановлена.")
+            sys.exit()
 
-    print("Начинаю парсинг страниц....\n")
+        print("Начинаю парсинг страниц....\n")
+
+    except KeyboardInterrupt:
+        graceful_shutdown(None, None)
